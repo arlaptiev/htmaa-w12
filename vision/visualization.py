@@ -11,6 +11,12 @@ from bidict import bidict
 # matplotlib.use('agg')
 matplotlib.use('TkAgg')
 
+#text stuff
+font = cv2.FONT_HERSHEY_SIMPLEX
+font_size = 3
+font_thickness = 2
+font_color = (0, 0, 255)  # BGR color format
+
 # Dictionary that maps from joint names to keypoint indices.
 KEYPOINT_DICT = bidict({
     'nose': 0,
@@ -267,17 +273,18 @@ def multi_visualization(img, keypoints, min_score = .11, mirror = True, verbose 
     for index, (y, x, score) in enumerate(reorganized):
       if verbose: print("x",x*width,"y:", y*height,"score:", score)
       if score > min_score:
-        res_dict[KP_DICT.inv[index]] = (y*height, x*width, score)
+        res_dict[KP_DICT.inv[index]] = (x*width, y*height, score)
         if KP_DICT['right_shoulder'] == index or KP_DICT['right_hip'] == index or KP_DICT['left_shoulder'] == index or KP_DICT['left_hip'] == index:
-          cv2.circle(img, (int(x*width), int(y*height)), 15, (0, 255, 0), -1)
+          cv2.circle(img, (int(x*width), int(y*height)), 15, (0,165,265), -1)
         else:
           cv2.circle(img, (int(x*width), int(y*height)), 5, (0, 0, 0), -1)
 
     if 'right_shoulder' in res_dict and 'right_hip' in res_dict and 'left_shoulder' in res_dict and 'left_hip' in res_dict:
       result.append(res_dict)
-      tx = (res_dict['left_hip'][1] + res_dict['right_hip'][1] + res_dict['left_shoulder'][1] + res_dict['right_shoulder'][1])/4
-      ty = (res_dict['left_hip'][0] + res_dict['right_hip'][0] + res_dict['left_shoulder'][0] + res_dict['right_shoulder'][0])/4
+      ty = (res_dict['left_hip'][1] + res_dict['right_hip'][1] + res_dict['left_shoulder'][1] + res_dict['right_shoulder'][1])/4
+      tx = (res_dict['left_hip'][0] + res_dict['right_hip'][0] + res_dict['left_shoulder'][0] + res_dict['right_shoulder'][0])/4
       cv2.circle(img, (int(tx), int(ty)), 15, (0, 0, 255), -1)
+      cv2.putText(img, str(len(result)-1), (int(tx), int(ty)), font, font_size, font_color, font_thickness)
   
   return img, result
    
